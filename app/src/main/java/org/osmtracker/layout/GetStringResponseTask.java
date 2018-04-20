@@ -3,11 +3,12 @@ package org.osmtracker.layout;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.osmtracker.activity.TLSSocketFactory;
 import org.osmtracker.util.CustomLayoutsUtils;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by james on 07/12/17.
@@ -25,9 +26,9 @@ public class GetStringResponseTask extends AsyncTask<String, Integer, String> {
     protected String doInBackground(String... params) {
         try {
             URL url = new URL(params[0]);
-            HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
-            InputStream stream = httpConnection.getInputStream();
-            return CustomLayoutsUtils.getStringFromStream(stream);
+            HttpsURLConnection.setDefaultSSLSocketFactory(new TLSSocketFactory());
+            HttpsURLConnection l_connection = (HttpsURLConnection) url.openConnection();
+            return CustomLayoutsUtils.getStringFromStream(l_connection.getInputStream());
 
         } catch (Exception e) {
             Log.e(TAG, "Error. Exception: " + e.toString());
