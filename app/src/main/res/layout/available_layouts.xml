@@ -5,5 +5,18 @@
     android:paddingTop="4dp"
     android:id="@+id/root_layout">
 
+    <!--In this list the available layouts will appears-->
+    <ListView
+        android:id="@+id/available_layouts_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+    </ListView>
+
+    <TextView
+        android:id="@+id/txt_loading_layouts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/available_layouts_loading_layouts"/>
 </LinearLayout>

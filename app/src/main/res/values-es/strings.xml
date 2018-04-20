@@ -51,7 +51,7 @@
   <string name="trackdetail_enddate">Hora de fin: </string>
   <string name="trackdetail_startloc">Se inicia en: </string>
   <string name="trackdetail_endloc">Termina en: </string>
-  <string name="trackdetail_exportdate">Se exportó a: </string>
+  <string name="trackdetail_exportdate">Se expo…rtó a: </string>
   <string name="trackdetail_osm_upload_date">Subido a OpenStreetMap:</string>
   <string name="trackdetail_btn_export">Exportar a GPX</string>
   <string name="trackdetail_export_notyet">(aún no exportado)</string>
@@ -155,6 +155,7 @@
   <string name="available_layouts_language_dialog_title">Lenguajes Disponibles</string>
   <string name="available_layouts_checking_language_dialog">Verificando tu idioma</string>
   <string name="available_layouts_downloading_dialog">Descargando…</string>
+  <string name="available_layouts_loading_layouts">Cargando…</string>
   <string name="available_layouts_successful_download">La disposición fue descargada con éxito</string>
   <string name="available_layouts_unsuccessful_download">No se pudo descargar la disposición, por favor intente más tarde</string>
 

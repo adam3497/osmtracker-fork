@@ -173,6 +173,7 @@
 	<string name="available_layouts_language_dialog_title">Available Languages</string>
 	<string name="available_layouts_checking_language_dialog">Checking local language versions</string>
 	<string name="available_layouts_downloading_dialog">Downloading…</string>
+	<string name="available_layouts_loading_layouts">Loading…</string>
 	<string name="available_layouts_successful_download">The layout was downloaded successfully</string>
 	<string name="available_layouts_unsuccessful_download">The layout can\'t be downloaded, try again later</string>
 

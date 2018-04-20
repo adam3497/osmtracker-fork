@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -19,10 +18,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +33,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +44,9 @@ import me.guillaumin.android.osmtracker.R;
 import me.guillaumin.android.osmtracker.layout.DownloadCustomLayoutTask;
 import me.guillaumin.android.osmtracker.layout.GetStringResponseTask;
 import me.guillaumin.android.osmtracker.layout.URLValidatorTask;
+import me.guillaumin.android.osmtracker.util.CustomAdapterList;
 import me.guillaumin.android.osmtracker.util.CustomLayoutsUtils;
+import me.guillaumin.android.osmtracker.util.ItemListUtil;
 import me.guillaumin.android.osmtracker.util.URLCreator;
 
 /**
@@ -65,6 +67,10 @@ public class AvailableLayouts extends Activity {
     private CheckBox defaultServerCheckBox;
     private CheckBox customServerCheckBox;
 
+    //options for list layouts
+    private ListView listLayoutsContainer;
+    private ArrayList<ItemListUtil> itemsArray;
+
     public static final int ISO_CHARACTER_LENGTH = 2;
 
     @Override
@@ -81,6 +87,7 @@ public class AvailableLayouts extends Activity {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void retrieveAvailableLayouts(){
         //while it makes the request
         final String waitingMessage = getResources().getString(R.string.available_layouts_connecting_message);
@@ -89,7 +96,10 @@ public class AvailableLayouts extends Activity {
         new GetStringResponseTask() {
             protected void onPostExecute(String response) {
                 setContentView(R.layout.available_layouts);
-                setAvailableLayouts(parseResponse(response));
+                listLayoutsContainer = (ListView) findViewById(R.id.available_layouts_list);
+                itemsArray = new ArrayList<ItemListUtil>();
+                List<String> options = parseResponse(response);
+                getDescriptionsList(options);
                 //when the request is done
                 setTitle(getResources().getString(R.string.prefs_ui_available_layout));
             }
@@ -107,28 +117,71 @@ public class AvailableLayouts extends Activity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /**
+     * It's used for search every layout description and put it (with de layout name) into de ListView (in SetAvailableLayouts)
+     */
+    @SuppressLint("StaticFieldLeak")
+    public void getDescriptionsList(List<String> options){
+        for(final String option : options){
+            String layoutName = CustomLayoutsUtils.convertFileName(option, false);
+            String url = URLCreator.createMetadataFileURL(getApplicationContext(), layoutName);
+            new GetStringResponseTask(){
+                @Override
+                protected void onPostExecute(String xmlFile) {
+                    String localLang = Locale.getDefault().getLanguage();
+                    String description = getDescriptionFor(xmlFile, localLang);
+                    if(description != null){
+                        setAvailableLayouts(option, description);
+                    }
+                    else{
+                        HashMap<String, String> languages = getLanguagesFor(xmlFile);
+                        Collection<String> languagesValues = languages.values();
+                        String defaultLang = (String)languagesValues.toArray()[0];
+                        String defaultDescription = getDescriptionFor(xmlFile, defaultLang);
+                        setAvailableLayouts(option, defaultDescription);
+                    }
+                }
+            }.execute(url);
+        }
+    }
 
     /**
      * It receives a string list with the names of the layouts to be listed in the activity
      */
-    public void setAvailableLayouts(List<String> options) {
-        LinearLayout rootLayout = (LinearLayout)findViewById(R.id.root_layout);
-        int AT_START = 0; //the position to insert the view at
-        ClickListener listener = new ClickListener();
+    @SuppressLint("StaticFieldLeak")
+    public void setAvailableLayouts(String option, String description) {
+        itemsArray.add(new ItemListUtil(CustomLayoutsUtils.convertFileName(option, false), description));
 
-        for(String option : options) {
-            Button layoutButton = new Button(this);
-            layoutButton.setHeight(150);
-            layoutButton.setText(CustomLayoutsUtils.convertFileName(option, false));
-            layoutButton.setTextSize((float)22 );
-            layoutButton.setTextColor(Color.WHITE);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(110, 0, 110, 0);
-            layoutButton.setLayoutParams(layoutParams);
-            layoutButton.setPadding(10,20,10,20);
-            layoutButton.setOnClickListener(listener);
-            rootLayout.addView(layoutButton,AT_START);
-        }
+        CustomAdapterList customAdapterList = new CustomAdapterList(this, itemsArray);
+        listLayoutsContainer.setAdapter(customAdapterList);
+        TextView txtLoading = (TextView) findViewById(R.id.txt_loading_layouts);
+        txtLoading.setVisibility(View.INVISIBLE);
+        listLayoutsContainer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Toast.makeText(AvailableLayouts.this, "You press the item: " + itemsArray.get(position).getAvailableLayoutName(), Toast.LENGTH_SHORT).show();
+                final String layoutName = itemsArray.get(position).getAvailableLayoutName();
+                String url = URLCreator.createMetadataFileURL(view.getContext(), layoutName);
+                final ProgressDialog dialog = new ProgressDialog(view.getContext());
+                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                dialog.setMessage(getResources().getString(R.string.available_layouts_checking_language_dialog));
+                dialog.show();
+                new GetStringResponseTask(){
+                    @Override
+                    protected void onPostExecute(String xmlFile) {
+                        dialog.dismiss();
+                        String localLang = Locale.getDefault().getLanguage();
+                        String description = getDescriptionFor(xmlFile, localLang);
+                        if (description != null) {
+                            showDescriptionDialog(layoutName,description,localLang);
+                        } else {//List all other languages
+                            HashMap<String, String> languages = getLanguagesFor(xmlFile);
+                            showLanguageSelectionDialog(languages, xmlFile, layoutName);
+                        }
+                    }
+                }.execute(url);
+            }
+        });
     }
 
     @Override
@@ -367,43 +420,16 @@ public class AvailableLayouts extends Activity {
         }
         Toast.makeText(this,getResources().getString(R.string.available_layouts_not_available_language),
                         Toast.LENGTH_LONG).show();
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle(getResources().getString(R.string.available_layouts_language_dialog_title));
-        b.setItems(options, new DialogInterface.OnClickListener() {
+        AlertDialog.Builder dialogLanguages = new AlertDialog.Builder(this);
+        dialogLanguages.setTitle(getResources().getString(R.string.available_layouts_language_dialog_title));
+        dialogLanguages.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String desc = getDescriptionFor(xmlFile,languages.get(options[i]));
                 showDescriptionDialog(layoutName,desc,languages.get(options[i]));
             }
         });
-        b.create().show();
-    }
-
-    private class ClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View view) {
-            final String layoutName = ""+((TextView) view).getText();
-            String url = URLCreator.createMetadataFileURL(view.getContext(), layoutName);
-            final ProgressDialog dialog = new ProgressDialog(view.getContext());
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setMessage(getResources().getString(R.string.available_layouts_checking_language_dialog));
-            dialog.show();
-            new GetStringResponseTask(){
-                @Override
-                protected void onPostExecute(String response) {
-                    dialog.dismiss();
-                    String xmlFile = response;
-                    String localLang = Locale.getDefault().getLanguage();
-                    String description = getDescriptionFor(xmlFile, localLang);
-                    if (description != null) {
-                        showDescriptionDialog(layoutName,description,localLang);
-                    } else {//List all other languages
-                        HashMap<String, String> languages = getLanguagesFor(xmlFile);
-                        showLanguageSelectionDialog(languages, xmlFile, layoutName);
-                    }
-                }
-            }.execute(url);
-        }
+        dialogLanguages.create().show();
     }
 
     private class DownloadListener implements AlertDialog.OnClickListener{
