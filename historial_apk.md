@@ -28,5 +28,9 @@ Características:
 - Se agrega el mensaje "Usted no tiene layouts descargados aún" cuando se borran todos los layouts
 - Se agregan las traducciones a español
 
+### Cuarta versión de las pruebas beta:  
+- Se corrigen las traducciones al español, mencionadas en [Trello](https://trello.com/c/DV3LeM5p)
+- Se corregí el repositorio por defecto para que la aplicación a la hora de entrar en `Available layouts` no se siga cayendo. Nombre de usuario, Nombre del repositorio y Nombre de la rama cambian a: `labexp`, `osmtracker-fork` y `layouts_backup`, respectivamente.  
+
 ### Cosas por hacer:
 - A la hora de presionar el "Custom Checkbox" en "Github Repository Settings" quitar la funcionalidad de borrar (Esto solo pasa cuando se inicia la aplicación por primera vez o se hace uso de esta funcionalidad por primera vez, las demás veces se autocompleta con los datos guardados anteriormente).
