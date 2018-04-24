@@ -10,13 +10,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,13 +58,13 @@ public class ButtonsPresets extends Activity {
     }
 
     public void refreshActivity(){
-        LinearLayout downloadedLayouts = (LinearLayout) findViewById(R.id.list_layouts);
+        ListView downloadedLayouts = (ListView) findViewById(R.id.list_layouts);
         //main layout for the default layout checkbox
         LinearLayout defaultSection = (LinearLayout) findViewById(R.id.buttons_presets);
         //restar the hashtable
         layoutsFileNames = new Hashtable<String, String>();
         listLayouts(downloadedLayouts);
-        checkCurrentLayout(downloadedLayouts, defaultSection);
+        //checkCurrentLayout(downloadedLayouts, defaultSection);
     }
 
     private void initializeAttributes(){
@@ -77,7 +77,7 @@ public class ButtonsPresets extends Activity {
                                                  OSMTracker.Preferences.VAL_STORAGE_DIR);
     }
 
-    private void listLayouts(LinearLayout rootLayout){
+    private void listLayouts(ListView rootLayout){
         File layoutsDir = new File(Environment.getExternalStorageDirectory(), storageDir + File.separator + Preferences.LAYOUTS_SUBDIR + File.separator);
         int AT_START = 0; //the position to insert the view at
         int fontSize = 20;

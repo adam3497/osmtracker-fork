@@ -15,12 +15,12 @@ import me.guillaumin.android.osmtracker.R;
  * Created by adma9717 on 19/04/18.
  */
 
-public class CustomAdapterList extends BaseAdapter {
+public class CustomAdapterListAvailable extends BaseAdapter {
 
     private Context context;
-    private ArrayList<ItemListUtil> listItems;
+    private ArrayList<ItemListAvailableUtil> listItems;
 
-    public CustomAdapterList(Context context, ArrayList<ItemListUtil> listItems) {
+    public CustomAdapterListAvailable(Context context, ArrayList<ItemListAvailableUtil> listItems) {
         this.context = context;
         this.listItems = listItems;
     }
@@ -43,7 +43,7 @@ public class CustomAdapterList extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         //instance the custom item in the list
-        ItemListUtil itemListUtil = (ItemListUtil) getItem(position);
+        ItemListAvailableUtil itemListAvailableUtil = (ItemListAvailableUtil) getItem(position);
 
         //inflate the custom appearance item
         convertView = LayoutInflater.from(context).inflate(R.layout.item_available_layout, null);
@@ -53,8 +53,8 @@ public class CustomAdapterList extends BaseAdapter {
         TextView layoutDescription = (TextView) convertView.findViewById(R.id.txt_item_description);;
 
         //put the title and description of the item
-        layoutTittle.setText(itemListUtil.getAvailableLayoutName());
-        layoutDescription.setText(itemListUtil.getAvailableLayoutDescription());
+        layoutTittle.setText(itemListAvailableUtil.getAvailableLayoutName());
+        layoutDescription.setText(itemListAvailableUtil.getAvailableLayoutDescription());
 
         return convertView;
     }

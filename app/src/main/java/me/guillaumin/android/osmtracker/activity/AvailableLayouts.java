@@ -44,9 +44,9 @@ import me.guillaumin.android.osmtracker.R;
 import me.guillaumin.android.osmtracker.layout.DownloadCustomLayoutTask;
 import me.guillaumin.android.osmtracker.layout.GetStringResponseTask;
 import me.guillaumin.android.osmtracker.layout.URLValidatorTask;
-import me.guillaumin.android.osmtracker.util.CustomAdapterList;
+import me.guillaumin.android.osmtracker.util.CustomAdapterListAvailable;
 import me.guillaumin.android.osmtracker.util.CustomLayoutsUtils;
-import me.guillaumin.android.osmtracker.util.ItemListUtil;
+import me.guillaumin.android.osmtracker.util.ItemListAvailableUtil;
 import me.guillaumin.android.osmtracker.util.URLCreator;
 
 /**
@@ -69,7 +69,7 @@ public class AvailableLayouts extends Activity {
 
     //options for list layouts
     private ListView listLayoutsContainer;
-    private ArrayList<ItemListUtil> itemsArray;
+    private ArrayList<ItemListAvailableUtil> itemsArray;
 
     public static final int ISO_CHARACTER_LENGTH = 2;
 
@@ -97,7 +97,7 @@ public class AvailableLayouts extends Activity {
             protected void onPostExecute(String response) {
                 setContentView(R.layout.available_layouts);
                 listLayoutsContainer = (ListView) findViewById(R.id.available_layouts_list);
-                itemsArray = new ArrayList<ItemListUtil>();
+                itemsArray = new ArrayList<ItemListAvailableUtil>();
                 List<String> options = parseResponse(response);
                 getDescriptionsList(options);
                 //when the request is done
@@ -150,10 +150,10 @@ public class AvailableLayouts extends Activity {
      */
     @SuppressLint("StaticFieldLeak")
     public void setAvailableLayouts(String option, String description) {
-        itemsArray.add(new ItemListUtil(CustomLayoutsUtils.convertFileName(option, false), description));
+        itemsArray.add(new ItemListAvailableUtil(CustomLayoutsUtils.convertFileName(option, false), description));
 
-        CustomAdapterList customAdapterList = new CustomAdapterList(this, itemsArray);
-        listLayoutsContainer.setAdapter(customAdapterList);
+        CustomAdapterListAvailable customAdapterListAvailable = new CustomAdapterListAvailable(this, itemsArray);
+        listLayoutsContainer.setAdapter(customAdapterListAvailable);
         TextView txtLoading = (TextView) findViewById(R.id.txt_loading_layouts);
         txtLoading.setVisibility(View.INVISIBLE);
         listLayoutsContainer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
