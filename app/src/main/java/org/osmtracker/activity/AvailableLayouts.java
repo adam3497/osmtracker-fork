@@ -74,13 +74,34 @@ public class AvailableLayouts extends Activity {
         editor = sharedPrefs.edit();
         // call task to download and parse the response to get the list of available layouts
         if (isNetworkAvailable(this)) {
-            retrieveAvailableLayouts();
+            validDefaultOptions();
         } else {
             Toast.makeText(getApplicationContext(),getResources().getString(R.string.available_layouts_connection_error),Toast.LENGTH_LONG).show();
             finish();
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
+    public void validDefaultOptions(){
+        String usernameGitHub = sharedPrefs.getString(OSMTracker.Preferences.KEY_GITHUB_USERNAME, OSMTracker.Preferences.KEY_GITHUB_USERNAME);
+        String repositoryName = sharedPrefs.getString(OSMTracker.Preferences.KEY_REPOSITORY_NAME, OSMTracker.Preferences.KEY_REPOSITORY_NAME);
+        String branchName = sharedPrefs.getString(OSMTracker.Preferences.KEY_BRANCH_NAME, OSMTracker.Preferences.KEY_BRANCH_NAME);
+        final String[] repositoryDefaultOptions = {usernameGitHub, repositoryName, branchName};
+        //we verify if the entered options are correct
+        new URLValidatorTask(){
+            protected void onPostExecute(Boolean result){
+                //validating the github repository
+                if(result){
+                    retrieveAvailableLayouts();
+                }else{
+                    Toast.makeText(getApplicationContext(),getResources().getString(R.string.available_layouts_response_null_exception),Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+        }.execute(repositoryDefaultOptions);
+    }
+
+    @SuppressLint("StaticFieldLeak")
     public void retrieveAvailableLayouts(){
         //while it makes the request
         final String waitingMessage = getResources().getString(R.string.available_layouts_connecting_message);
@@ -88,10 +109,16 @@ public class AvailableLayouts extends Activity {
         String url = URLCreator.createMetadataDirUrl(this);
         new GetStringResponseTask() {
             protected void onPostExecute(String response) {
-                setContentView(R.layout.available_layouts);
-                setAvailableLayouts(parseResponse(response));
-                //when the request is done
-                setTitle(getResources().getString(R.string.prefs_ui_available_layout));
+                if(response == null){
+                    Toast.makeText(getApplicationContext(),getResources().getString(R.string.available_layouts_response_null_exception),Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                else{
+                    setContentView(R.layout.available_layouts);
+                    setAvailableLayouts(parseResponse(response));
+                    //when the request is done
+                    setTitle(getResources().getString(R.string.prefs_ui_available_layout));
+                }
             }
 
         }.execute(url);
