@@ -149,7 +149,7 @@
 
   <!-- Available Layouts messages -->
   <string name="available_layouts_connection_error">Error: No se puede conectar a internet, por favor revise su conexión</string>
-  <string name="available_layouts_response_null_exception">Hubo un error interno, contacte con el desarrollador</string>
+  <string name="available_layouts_response_null_exception">Error: No se pudo conectar con el servidor de disposiciones personalizadas predeterminado</string>
   <string name="available_layouts_connecting_message">(Conectando…)</string>
   <string name="available_layouts_description_dialog_positive_confirmation">Descargar</string>
   <string name="available_layouts_not_available_language">Tu idioma no está disponible, por favor seleccione uno de la lista</string>

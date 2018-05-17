@@ -30,6 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmtracker.OSMTracker;
+import org.osmtracker.R;
+import org.osmtracker.layout.DownloadCustomLayoutTask;
+import org.osmtracker.layout.GetStringResponseTask;
+import org.osmtracker.layout.URLValidatorTask;
+import org.osmtracker.util.CustomLayoutsUtils;
+import org.osmtracker.util.URLCreator;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -39,13 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
-import org.osmtracker.R;
-import org.osmtracker.layout.DownloadCustomLayoutTask;
-import org.osmtracker.layout.GetStringResponseTask;
-import org.osmtracker.layout.URLValidatorTask;
-import org.osmtracker.util.CustomLayoutsUtils;
-import org.osmtracker.util.URLCreator;
 
 /**
  * Created by emmanuel on 10/11/17.
@@ -72,9 +71,10 @@ public class AvailableLayouts extends Activity {
         super.onCreate(savedInstanceState);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPrefs.edit();
+        setTitle(getResources().getString(R.string.prefs_ui_available_layout));
         // call task to download and parse the response to get the list of available layouts
         if (isNetworkAvailable(this)) {
-            validDefaultOptions();
+            validateDefaultOptions();
         } else {
             Toast.makeText(getApplicationContext(),getResources().getString(R.string.available_layouts_connection_error),Toast.LENGTH_LONG).show();
             finish();
@@ -82,7 +82,7 @@ public class AvailableLayouts extends Activity {
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void validDefaultOptions(){
+    public void validateDefaultOptions(){
         String usernameGitHub = sharedPrefs.getString(OSMTracker.Preferences.KEY_GITHUB_USERNAME, OSMTracker.Preferences.KEY_GITHUB_USERNAME);
         String repositoryName = sharedPrefs.getString(OSMTracker.Preferences.KEY_REPOSITORY_NAME, OSMTracker.Preferences.KEY_REPOSITORY_NAME);
         String branchName = sharedPrefs.getString(OSMTracker.Preferences.KEY_BRANCH_NAME, OSMTracker.Preferences.KEY_BRANCH_NAME);
