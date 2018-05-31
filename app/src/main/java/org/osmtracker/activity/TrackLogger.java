@@ -153,8 +153,6 @@ public class TrackLogger extends Activity {
 	private ComponentName mediaButtonReceiver;
 
 	private ArrayList<String> layoutNameTags = new ArrayList<String>();
-
-	private SharedPreferences sharedPreferences;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -164,8 +162,7 @@ public class TrackLogger extends Activity {
 		Log.v(TAG, "Starting for track id " + currentTrackId);
 
 		//save the initial layout file name in tags array
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String layoutName = sharedPreferences.getString(OSMTracker.Preferences.KEY_UI_BUTTONS_LAYOUT, OSMTracker.Preferences.VAL_UI_BUTTONS_LAYOUT);
+		String layoutName = CustomLayoutsUtils.getCurrentLayoutName(getApplicationContext());
 		layoutNameTags.add(layoutName);
 
 		gpsLoggerServiceIntent = new Intent(this, GPSLogger.class);
@@ -309,8 +306,7 @@ public class TrackLogger extends Activity {
 		mAudioManager.registerMediaButtonEventReceiver(mediaButtonReceiver);
 
 		//save the layout file name if it change, in tags array
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String layoutName = sharedPreferences.getString(OSMTracker.Preferences.KEY_UI_BUTTONS_LAYOUT, OSMTracker.Preferences.VAL_UI_BUTTONS_LAYOUT);
+		String layoutName = CustomLayoutsUtils.getCurrentLayoutName(getApplicationContext());
 		if(! layoutNameTags.contains(layoutName)){
 			layoutNameTags.add(layoutName);
 		}
